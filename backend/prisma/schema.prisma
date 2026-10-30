@@ -1,0 +1,24 @@
+// Prisma 8 contract source: ./contract.ts
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  role      Role     @default(MEMBER)
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  RECEPTIONIST
+  TRAINER
+  MEMBER
+}
