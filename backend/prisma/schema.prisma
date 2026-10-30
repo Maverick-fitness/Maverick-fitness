@@ -1,4 +1,3 @@
-// Prisma 8 contract source: ./contract.ts
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -9,11 +8,13 @@ generator client {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String?
-  role      Role     @default(MEMBER)
-  createdAt DateTime @default(now())
+  id            String         @id @default(uuid())
+  email         String         @unique
+  name          String?
+  role          Role           @default(MEMBER)
+  createdAt     DateTime       @default(now())
+  subscriptions Subscription[]
+  payments      Payment[]
 }
 
 enum Role {
@@ -21,4 +22,69 @@ enum Role {
   RECEPTIONIST
   TRAINER
   MEMBER
+}
+
+model MembershipPlan {
+  id            String         @id @default(uuid())
+  name          String         @unique
+  description   String?
+  price         Float
+  duration      Int            // Duration in days
+  status        PlanStatus     @default(ACTIVE)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  subscriptions Subscription[]
+}
+
+enum PlanStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Subscription {
+  id          String             @id @default(uuid())
+  userId      String
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId      String
+  plan        MembershipPlan     @relation(fields: [planId], references: [id])
+  startDate   DateTime           @default(now())
+  expiryDate  DateTime
+  status      SubscriptionStatus @default(ACTIVE)
+  payments    Payment[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  PENDING
+}
+
+model Payment {
+  id             String        @id @default(uuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id])
+  subscriptionId String?
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  amount         Float
+  method         PaymentMethod
+  status         PaymentStatus @default(COMPLETED)
+  reference      String?       @unique
+  createdAt      DateTime      @default(now())
+}
+
+enum PaymentMethod {
+  CASH
+  CREDIT_CARD
+  BANK_TRANSFER
+  MOBILE_MONEY
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
 }
