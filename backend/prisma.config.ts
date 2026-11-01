@@ -1,12 +1,17 @@
-import "dotenv/config";
-import { definePrismaConfig } from "prisma/config";
-import { defineConfig as ormConfig } from "@prisma/orm-postgres/config";
-
-export default definePrismaConfig({
-  orm: ormConfig({
-    contract: "./prisma/contract.ts",
-    db: {
-      connection: process.env["DATABASE_URL"]!,
-    },
-  }),
-});
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}
